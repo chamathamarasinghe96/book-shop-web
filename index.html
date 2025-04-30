@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C BookHouse - Your Literary Destination in Colombo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFF8F0;
+            color: #333333;
+            -webkit-font-smoothing: antialiased;
+             -moz-osx-font-smoothing: grayscale;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            color: #4A2519;
+        }
+        .bg-brand-cream { background-color: #FFF8F0; }
+        .bg-brand-beige { background-color: #F5EDE0; }
+        .bg-brand-brown-dark { background-color: #4A2519; }
+        .bg-brand-brown-light { background-color: #7d4f41; }
+        .text-brand-brown-dark { color: #4A2519; }
+        .text-brand-brown-light { color: #7d4f41; }
+        .text-brand-accent { color: #D4AF37; }
+        .border-brand-brown-dark { border-color: #4A2519; }
+        .ring-brand-accent { --tw-ring-color: #D4AF37; }
+        .focus\:border-brand-accent:focus { border-color: #D4AF37; }
+        .focus\:ring-brand-accent:focus { --tw-ring-color: #D4AF37; }
+        .hover\:text-brand-accent:hover { color: #D4AF37; }
+        .hover\:bg-brand-accent:hover { background-color: #D4AF37; }
+        html { scroll-behavior: smooth; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-element {
+            opacity: 0;
+            animation: fadeIn 0.8s ease-out forwards;
+            animation-play-state: paused;
+        }
+        .fade-in-element.visible { animation-play-state: running; }
+        #threejs-canvas-container, #p5-canvas-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+        }
+        #p5-canvas-container { opacity: 0.08; }
+        #threejs-canvas-container { opacity: 0.3; display: flex; align-items: center; justify-content: center; }
+        #threejs-canvas-container canvas, #p5-canvas-container canvas { display: block; max-width: 100%; max-height: 100%; }
+    </style>
+</head>
+<body class="bg-brand-cream antialiased">
+
+    <header class="bg-brand-brown-dark text-white sticky top-0 z-50 shadow-md">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="#hero" class="text-2xl font-bold font-serif">C BookHouse</a>
+            <nav class="hidden md:flex space-x-5 items-center text-sm lg:text-base">
+                <a href="#about" class="hover:text-brand-accent transition duration-300">About</a>
+                <a href="#collections" class="hover:text-brand-accent transition duration-300">Collections</a>
+                <a href="#author-spotlight" class="hover:text-brand-accent transition duration-300">Authors</a>
+                <a href="#events" class="hover:text-brand-accent transition duration-300">Events</a>
+                <a href="#blog" class="hover:text-brand-accent transition duration-300">Blog</a>
+                <a href="#community" class="hover:text-brand-accent transition duration-300">Community</a>
+                <a href="#contact" class="hover:text-brand-accent transition duration-300">Contact</a>
+                <button id="searchIcon" class="text-white hover:text-brand-accent transition duration-300 ml-2" aria-label="Search">
+                    <i class="fas fa-search"></i>
+                </button>
+            </nav>
+            <button id="mobileMenuButton" class="md:hidden text-white focus:outline-none" aria-label="Open menu">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+        <div id="mobileMenu" class="hidden md:hidden bg-brand-brown-light absolute top-full left-0 w-full shadow-lg">
+            <a href="#about" class="block px-6 py-3 text-white hover:bg-brand-brown-dark transition duration-300">About</a>
+            <a href="#collections" class="block px-6 py-3 text-white hover:bg-brand-brown-dark transition duration-300">Collections</a>
+            <a href="#author-spotlight" class="block px-6 py-3 text-white hover:bg-brand-brown-dark transition duration-300">Authors</a>
+            <a href="#events" class="block px-6 py-3 text-white hover:bg-brand-brown-dark transition duration-300">Events</a>
+            <a href="#blog" class="block px-6 py-3 text-white hover:bg-brand-brown-dark transition duration-300">Blog</a>
+            <a href="#community" class="block px-6 py-3 text-white hover:bg-brand-brown-dark transition duration-300">Community</a>
+            <a href="#contact" class="block px-6 py-3 text-white hover:bg-brand-brown-dark transition duration-300">Contact</a>
+            <div class="px-6 py-3">
+                 <input type="search" placeholder="Search books..." class="w-full p-2 rounded bg-white text-gray-800 focus:outline-none focus:ring-2 ring-brand-accent" aria-label="Search">
+            </div>
+        </div>
+        <div id="searchBar" class="hidden container mx-auto px-6 py-2 bg-brand-brown-light">
+            <input type="search" placeholder="Search for books, authors, genres..." class="w-full p-2 rounded bg-white text-gray-800 focus:outline-none focus:ring-2 ring-brand-accent" aria-label="Search site">
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="relative bg-brand-beige py-28 md:py-40 text-center overflow-hidden min-h-[75vh] flex items-center justify-center">
+            <div id="p5-canvas-container"></div>
+            <div class="container mx-auto px-6 z-10 relative">
+                <h1 class="text-4xl md:text-6xl font-bold text-brand-brown-dark mb-4 fade-in-element">C BookHouse</h1>
+                <p class="text-lg md:text-xl text-brand-brown-light mb-8 max-w-3xl mx-auto fade-in-element" style="animation-delay: 0.2s;">Your curated escape in Colombo. Discover diverse reads, connect with fellow book lovers, and let us help you find your next story.</p>
+                <a href="#collections" class="bg-brand-brown-dark hover:bg-brand-brown-light text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105 inline-block fade-in-element" style="animation-delay: 0.4s;">Explore Our Shelves</a>
+                <div id="threejs-canvas-container" class="w-64 h-64 md:w-80 md:h-80"></div>
+            </div>
+        </section>
+
+        <section id="featured" class="py-16 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center text-brand-brown-dark mb-12">In the Spotlight</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-brand-beige p-6 rounded-lg shadow-md hover:shadow-xl transition duration-300 fade-in-element">
+                        <span class="inline-block bg-brand-accent text-white text-xs font-bold px-3 py-1 rounded-full mb-3">New Arrival</span>
+                        <h3 class="text-xl font-semibold text-brand-brown-dark mb-2">Whispers of the Lagoon</h3>
+                        <p class="text-sm text-brand-brown-light mb-1">by Ayana Perera</p>
+                        <p class="text-gray-600 text-sm mb-4">A compelling new novel weaving family secrets and Sri Lankan coastal life...</p>
+                        <a href="#" class="text-brand-brown-dark hover:text-brand-accent font-medium transition duration-300">Discover More <i class="fas fa-arrow-right text-xs ml-1"></i></a>
+                    </div>
+                    <div class="bg-brand-beige p-6 rounded-lg shadow-md hover:shadow-xl transition duration-300 fade-in-element" style="animation-delay: 0.1s;">
+                        <span class="inline-block bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Bestseller</span>
+                         <h3 class="text-xl font-semibold text-brand-brown-dark mb-2">The Midnight Library</h3>
+                        <p class="text-sm text-brand-brown-light mb-1">by Matt Haig</p>
+                        <p class="text-gray-600 text-sm mb-4">Explore the infinite choices that make up a life in this global phenomenon...</p>
+                        <a href="#" class="text-brand-brown-dark hover:text-brand-accent font-medium transition duration-300">Discover More <i class="fas fa-arrow-right text-xs ml-1"></i></a>
+                    </div>
+                    <div class="bg-brand-beige p-6 rounded-lg shadow-md hover:shadow-xl transition duration-300 fade-in-element" style="animation-delay: 0.2s;">
+                        <span class="inline-block bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Staff Pick</span>
+                         <h3 class="text-xl font-semibold text-brand-brown-dark mb-2">Island of a Thousand Mirrors</h3>
+                        <p class="text-sm text-brand-brown-light mb-1">by Nayomi Munaweera</p>
+                        <p class="text-gray-600 text-sm mb-4">A powerful, poignant story spanning generations against Sri Lanka's recent past...</p>
+                        <a href="#" class="text-brand-brown-dark hover:text-brand-accent font-medium transition duration-300">Discover More <i class="fas fa-arrow-right text-xs ml-1"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="collections" class="py-16 bg-brand-beige">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center text-brand-brown-dark mb-12">Explore Our Curated Collections</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-white p-8 rounded-lg shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 fade-in-element">
+                        <div class="text-4xl text-brand-accent mb-4"><i class="fas fa-feather-alt"></i></div>
+                        <h3 class="text-2xl font-semibold text-brand-brown-dark mb-3">Sinhala Literature</h3>
+                        <p class="text-gray-600 mb-4 text-sm">From revered classics to vibrant contemporary voices shaping the Sinhala literary landscape.</p>
+                        <p class="font-medium text-brand-brown-light mb-4 text-sm">~ 2,000+ Titles</p>
+                        <a href="#" class="text-sm font-semibold text-brand-brown-dark hover:text-brand-accent">View Collection <i class="fas fa-chevron-right ml-1 text-xs"></i></a>
+                    </div>
+                     <div class="bg-white p-8 rounded-lg shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 fade-in-element" style="animation-delay: 0.05s;">
+                        <div class="text-4xl text-brand-accent mb-4"><i class="fas fa-globe-americas"></i></div>
+                        <h3 class="text-2xl font-semibold text-brand-brown-dark mb-3">International Fiction</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Journey through global narratives with bestsellers, award-winners, and essential translated works.</p>
+                        <p class="font-medium text-brand-brown-light mb-4 text-sm">~ 1,500+ Titles</p>
+                         <a href="#" class="text-sm font-semibold text-brand-brown-dark hover:text-brand-accent">View Collection <i class="fas fa-chevron-right ml-1 text-xs"></i></a>
+                    </div>
+                     <div class="bg-white p-8 rounded-lg shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 fade-in-element" style="animation-delay: 0.1s;">
+                        <div class="text-4xl text-brand-accent mb-4"><i class="fas fa-landmark"></i></div>
+                        <h3 class="text-2xl font-semibold text-brand-brown-dark mb-3">History & Culture</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Delve into Sri Lankan heritage, world history, biographies, and insightful cultural analysis.</p>
+                        <p class="font-medium text-brand-brown-light mb-4 text-sm">~ 900+ Titles</p>
+                        <a href="#" class="text-sm font-semibold text-brand-brown-dark hover:text-brand-accent">View Collection <i class="fas fa-chevron-right ml-1 text-xs"></i></a>
+                    </div>
+                     <div class="bg-white p-8 rounded-lg shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 fade-in-element" style="animation-delay: 0.15s;">
+                        <div class="text-4xl text-brand-accent mb-4"><i class="fas fa-lightbulb"></i></div>
+                        <h3 class="text-2xl font-semibold text-brand-brown-dark mb-3">Non-Fiction & Ideas</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Expand your horizons with books on science, philosophy, self-improvement, business, and current affairs.</p>
+                        <p class="font-medium text-brand-brown-light mb-4 text-sm">~ 1,000+ Titles</p>
+                        <a href="#" class="text-sm font-semibold text-brand-brown-dark hover:text-brand-accent">View Collection <i class="fas fa-chevron-right ml-1 text-xs"></i></a>
+                    </div>
+                     <div class="bg-white p-8 rounded-lg shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 fade-in-element" style="animation-delay: 0.2s;">
+                        <div class="text-4xl text-brand-accent mb-4"><i class="fas fa-child"></i></div>
+                        <h3 class="text-2xl font-semibold text-brand-brown-dark mb-3">Children & Young Adult</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Ignite young imaginations with picture books, educational series, and thrilling YA adventures.</p>
+                        <p class="font-medium text-brand-brown-light mb-4 text-sm">~ 1,200+ Titles</p>
+                        <a href="#" class="text-sm font-semibold text-brand-brown-dark hover:text-brand-accent">View Collection <i class="fas fa-chevron-right ml-1 text-xs"></i></a>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 fade-in-element" style="animation-delay: 0.25s;">
+                        <div class="text-4xl text-brand-accent mb-4"><i class="fas fa-paint-brush"></i></div>
+                        <h3 class="text-2xl font-semibold text-brand-brown-dark mb-3">Art & Photography</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Explore visual creativity through stunning art monographs, photography collections, and design inspiration.</p>
+                        <p class="font-medium text-brand-brown-light mb-4 text-sm">~ 400+ Titles</p>
+                         <a href="#" class="text-sm font-semibold text-brand-brown-dark hover:text-brand-accent">View Collection <i class="fas fa-chevron-right ml-1 text-xs"></i></a>
+                    </div>
+                      <div class="bg-white p-8 rounded-lg shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 fade-in-element" style="animation-delay: 0.3s;">
+                        <div class="text-4xl text-brand-accent mb-4"><i class="fas fa-book-reader"></i></div>
+                        <h3 class="text-2xl font-semibold text-brand-brown-dark mb-3">Academic & Professional</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Supporting students and professionals with textbooks, reference materials, and essential study guides.</p>
+                        <p class="font-medium text-brand-brown-light mb-4 text-sm">~ 1,200+ Titles</p>
+                         <a href="#" class="text-sm font-semibold text-brand-brown-dark hover:text-brand-accent">View Collection <i class="fas fa-chevron-right ml-1 text-xs"></i></a>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 fade-in-element" style="animation-delay: 0.35s;">
+                        <div class="text-4xl text-brand-accent mb-4"><i class="fas fa-gem"></i></div>
+                        <h3 class="text-2xl font-semibold text-brand-brown-dark mb-3">Rare & Special Editions</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Discover unique literary treasures including signed copies, first editions, and sought-after collector's items.</p>
+                        <p class="font-medium text-brand-brown-light mb-4 text-sm">~ 300+ Rare Items</p>
+                         <a href="#" class="text-sm font-semibold text-brand-brown-dark hover:text-brand-accent">View Collection <i class="fas fa-chevron-right ml-1 text-xs"></i></a>
+                    </div>
+                     <div class="bg-white p-8 rounded-lg shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 fade-in-element" style="animation-delay: 0.4s;">
+                        <div class="text-4xl text-brand-accent mb-4"><i class="fas fa-gift"></i></div>
+                        <h3 class="text-2xl font-semibold text-brand-brown-dark mb-3">Gifts & Stationery</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Find unique notebooks, quality pens, planners, journals, and bookish gifts for every occasion.</p>
+                        <p class="font-medium text-brand-brown-light mb-4 text-sm">Curated Selection</p>
+                        <a href="#" class="text-sm font-semibold text-brand-brown-dark hover:text-brand-accent">Browse Gifts <i class="fas fa-chevron-right ml-1 text-xs"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+         <section id="author-spotlight" class="py-16 bg-white">
+            <div class="container mx-auto px-6">
+                 <h2 class="text-3xl font-bold text-center text-brand-brown-dark mb-12">Author Spotlight</h2>
+                 <div class="bg-brand-beige rounded-lg shadow-lg overflow-hidden md:flex fade-in-element">
+                     <div class="md:w-1/3 bg-gray-300 flex items-center justify-center text-gray-500 h-64 md:h-auto min-h-[250px]">
+                          (Author Photo Placeholder)
+                     </div>
+                     <div class="p-8 md:w-2/3">
+                         <h3 class="text-2xl font-semibold text-brand-brown-dark mb-3">Shehan Karunatilaka</h3>
+                         <p class="text-sm text-brand-brown-light mb-4">Booker Prize Winner 2022</p>
+                         <p class="text-gray-700 leading-relaxed mb-4 text-sm md:text-base">Renowned Sri Lankan author Shehan Karunatilaka captured global attention with his masterful novel "The Seven Moons of Maali Almeida". His unique blend of sharp satire, historical depth, and supernatural elements offers compelling perspectives on Sri Lanka's complex past and present.</p>
+                         <p class="text-gray-700 leading-relaxed mb-6 text-sm md:text-base">Explore his critically acclaimed works, available now at C BookHouse.</p>
+                         <div>
+                             <a href="#" class="text-brand-brown-dark hover:text-brand-accent font-medium mr-4 transition duration-300">Shop His Books <i class="fas fa-book ml-1 text-xs"></i></a>
+                             <a href="#" class="text-brand-brown-dark hover:text-brand-accent font-medium transition duration-300">Author Bio <i class="fas fa-info-circle ml-1 text-xs"></i></a>
+                         </div>
+                     </div>
+                 </div>
+            </div>
+        </section>
+
+        <section id="events" class="py-16 bg-brand-beige">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center text-brand-brown-dark mb-12">Happenings at C BookHouse</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col md:flex-row fade-in-element">
+                       <div class="bg-brand-brown-dark text-white p-6 flex flex-col items-center justify-center text-center md:w-1/4 min-w-[100px]">
+                            <span class="text-4xl font-bold">10</span>
+                            <span class="text-lg uppercase">Jun</span>
+                            <span class="text-sm mt-1">2025</span>
+                       </div>
+                       <div class="p-6 flex-1">
+                            <h3 class="text-xl font-semibold text-brand-brown-dark mb-2">Book Launch & Signing: 'City of Echoes'</h3>
+                            <p class="text-gray-600 text-sm mb-1"><i class="fas fa-user fa-fw mr-2"></i>Priya David</p>
+                            <p class="text-gray-600 text-sm mb-3"><i class="fas fa-clock fa-fw mr-2"></i>6:30 PM - 8:00 PM</p>
+                            <p class="text-gray-700 text-sm mb-4">Join the launch of a captivating Colombo-based thriller. Includes Q&A and book signing.</p>
+                            <a href="#" class="text-brand-brown-dark hover:text-brand-accent font-medium text-sm transition duration-300">RSVP for Event <i class="fas fa-ticket-alt ml-1"></i></a>
+                       </div>
+                    </div>
+                     <div class="bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col md:flex-row fade-in-element" style="animation-delay: 0.1s;">
+                       <div class="bg-brand-brown-dark text-white p-6 flex flex-col items-center justify-center text-center md:w-1/4 min-w-[100px]">
+                            <span class="text-4xl font-bold">22</span>
+                            <span class="text-lg uppercase">Jun</span>
+                            <span class="text-sm mt-1">2025</span>
+                       </div>
+                       <div class="p-6 flex-1">
+                            <h3 class="text-xl font-semibold text-brand-brown-dark mb-2">Weekend Story Time & Craft Session</h3>
+                            <p class="text-gray-600 text-sm mb-1"><i class="fas fa-child fa-fw mr-2"></i>Recommended Ages 4-7</p>
+                            <p class="text-gray-600 text-sm mb-3"><i class="fas fa-clock fa-fw mr-2"></i>10:30 AM - 11:30 AM</p>
+                            <p class="text-gray-700 text-sm mb-4">Bring your little ones for a fun morning of interactive stories and creative crafts.</p>
+                            <a href="#" class="text-brand-brown-dark hover:text-brand-accent font-medium text-sm transition duration-300">View Details <i class="fas fa-info-circle ml-1"></i></a>
+                       </div>
+                    </div>
+                </div>
+                 <div class="text-center mt-12">
+                    <a href="#" class="text-brand-brown-dark hover:text-brand-accent font-semibold transition duration-300">View Full Events Calendar <i class="fas fa-calendar-alt ml-1"></i></a>
+                </div>
+            </div>
+        </section>
+
+         <section id="blog" class="py-16 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center text-brand-brown-dark mb-12">From Our Blog: Insights & Reviews</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="border border-gray-200 rounded-lg overflow-hidden flex flex-col fade-in-element">
+                         <div class="h-48 bg-gray-300 flex items-center justify-center text-gray-500">(Blog Image)</div>
+                         <div class="p-6 flex flex-col flex-grow">
+                             <p class="text-xs text-gray-500 mb-1 uppercase">June 05, 2025 | Book Reviews</p>
+                             <h3 class="text-lg font-semibold text-brand-brown-dark mb-3 flex-grow hover:text-brand-accent transition duration-300"><a href="#">Magical Realism's Resurgence in Sri Lankan Fiction</a></h3>
+                             <p class="text-gray-600 text-sm mb-4">Exploring how contemporary authors use magical realism to tackle complex narratives...</p>
+                             <a href="#" class="text-sm font-semibold text-brand-brown-dark hover:text-brand-accent mt-auto">Read Full Post <i class="fas fa-arrow-right ml-1 text-xs"></i></a>
+                         </div>
+                    </div>
+                     <div class="border border-gray-200 rounded-lg overflow-hidden flex flex-col fade-in-element" style="animation-delay: 0.1s;">
+                         <div class="h-48 bg-gray-300 flex items-center justify-center text-gray-500">(Blog Image)</div>
+                         <div class="p-6 flex flex-col flex-grow">
+                             <p class="text-xs text-gray-500 mb-1 uppercase">May 28, 2025 | Reading Life</p>
+                             <h3 class="text-lg font-semibold text-brand-brown-dark mb-3 flex-grow hover:text-brand-accent transition duration-300"><a href="#">Designing Your Perfect Reading Nook: 5 Simple Steps</a></h3>
+                             <p class="text-gray-600 text-sm mb-4">Tips to create a cozy, inviting, and personal space dedicated to your reading time...</p>
+                             <a href="#" class="text-sm font-semibold text-brand-brown-dark hover:text-brand-accent mt-auto">Read Full Post <i class="fas fa-arrow-right ml-1 text-xs"></i></a>
+                         </div>
+                    </div>
+                     <div class="border border-gray-200 rounded-lg overflow-hidden flex flex-col fade-in-element" style="animation-delay: 0.2s;">
+                         <div class="h-48 bg-gray-300 flex items-center justify-center text-gray-500">(Blog Image)</div>
+                         <div class="p-6 flex flex-col flex-grow">
+                             <p class="text-xs text-gray-500 mb-1 uppercase">May 20, 2025 | Author Interviews</p>
+                             <h3 class="text-lg font-semibold text-brand-brown-dark mb-3 flex-grow hover:text-brand-accent transition duration-300"><a href="#">In Conversation With Ashok Ferrey: Wit and Wanderlust</a></h3>
+                             <p class="text-gray-600 text-sm mb-4">We chat with the celebrated author about his unique style, inspirations, and latest work...</p>
+                             <a href="#" class="text-sm font-semibold text-brand-brown-dark hover:text-brand-accent mt-auto">Read Full Post <i class="fas fa-arrow-right ml-1 text-xs"></i></a>
+                         </div>
+                    </div>
+                </div>
+                 <div class="text-center mt-12">
+                    <a href="#" class="text-brand-brown-dark hover:text-brand-accent font-semibold transition duration-300">Explore All Blog Posts <i class="fas fa-newspaper ml-1"></i></a>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="py-16 bg-brand-cream">
+            <div class="container mx-auto px-6">
+                <div class="max-w-4xl mx-auto text-center">
+                     <h2 class="text-3xl font-bold text-brand-brown-dark mb-6">Your Literary Home in Colombo</h2>
+                     <p class="text-lg text-gray-700 mb-6 leading-relaxed fade-in-element">Since 2005, C BookHouse on Galle Road has been a beloved haven for readers in Sri Lanka. We're passionate about curating a world of books, fostering literary discovery, and creating a welcoming atmosphere where stories and ideas flourish.</p>
+                     <p class="text-lg text-gray-700 mb-8 leading-relaxed fade-in-element" style="animation-delay: 0.1s;">Step inside and explore diverse collections, from global bestsellers and Sri Lankan narratives to academic texts and children's wonders. Our knowledgeable team is always ready with a recommendation. More than just a store, C BookHouse is a community hub where Colombo reads, connects, and gets inspired.</p>
+                     <div class="flex flex-wrap justify-center gap-x-6 gap-y-4 fade-in-element" style="animation-delay: 0.2s;">
+                         <div class="text-center p-4">
+                             <div class="text-4xl text-brand-accent mb-2"><i class="fas fa-book-open"></i></div>
+                             <p class="font-semibold text-brand-brown-dark text-sm">Diverse Collections</p>
+                         </div>
+                         <div class="text-center p-4">
+                             <div class="text-4xl text-brand-accent mb-2"><i class="fas fa-comments"></i></div>
+                             <p class="font-semibold text-brand-brown-dark text-sm">Engaging Events</p>
+                         </div>
+                         <div class="text-center p-4">
+                             <div class="text-4xl text-brand-accent mb-2"><i class="fas fa-users"></i></div>
+                             <p class="font-semibold text-brand-brown-dark text-sm">Community Focused</p>
+                         </div>
+                          <div class="text-center p-4">
+                             <div class="text-4xl text-brand-accent mb-2"><i class="fas fa-user-friends"></i></div>
+                             <p class="font-semibold text-brand-brown-dark text-sm">Knowledgeable Staff</p>
+                         </div>
+                          <div class="text-center p-4">
+                             <div class="text-4xl text-brand-accent mb-2"><i class="fas fa-coffee"></i></div>
+                             <p class="font-semibold text-brand-brown-dark text-sm">Welcoming Space</p>
+                         </div>
+                     </div>
+                </div>
+            </div>
+        </section>
+
+         <section id="community" class="py-16 bg-brand-beige">
+            <div class="container mx-auto px-6">
+                <div class="text-center">
+                     <h2 class="text-3xl font-bold text-brand-brown-dark mb-6">Join the C BookHouse Family</h2>
+                     <p class="text-lg text-gray-700 max-w-3xl mx-auto mb-8 fade-in-element">Connect with fellow readers! Participate in our monthly book clubs (covering Sinhala & English fiction), join specialized discussion groups, and share your literary journey with a vibrant community.</p>
+                    <div class="bg-white p-8 rounded-lg shadow-lg inline-block max-w-lg text-left fade-in-element" style="animation-delay: 0.1s;">
+                        <h4 class="text-xl font-semibold text-brand-brown-dark mb-3 flex items-center"><i class="fas fa-star text-brand-accent mr-3"></i>Unlock Member Benefits</h4>
+                        <p class="text-gray-600 mb-4 text-sm md:text-base">Sign up for our free loyalty program! Enjoy exclusive member discounts, early access to sales & events, personalized reading recommendations, and special birthday treats.</p>
+                        <a href="#" class="inline-block bg-brand-accent hover:bg-yellow-600 text-brand-brown-dark font-bold py-2 px-6 rounded-full shadow transition duration-300">Become a Member Today!</a>
+                    </div>
+                     <h3 class="text-2xl font-bold text-brand-brown-dark mt-16 mb-8">What Our Readers Say</h3>
+                 </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-sm text-center fade-in-element" style="animation-delay: 0.2s;">
+                         <i class="fas fa-quote-left text-2xl text-brand-accent mb-4"></i>
+                         <p class="text-gray-600 italic mb-4 text-sm">"C BookHouse is my absolute favourite bookstore in Colombo. The vibe is perfect, the selection is brilliant, and the staff actually read!"</p>
+                         <p class="font-semibold text-brand-brown-dark text-sm">- Dilani F.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm text-center fade-in-element" style="animation-delay: 0.3s;">
+                         <i class="fas fa-quote-left text-2xl text-brand-accent mb-4"></i>
+                         <p class="text-gray-600 italic mb-4 text-sm">"Finally found the specific historical reference I needed after searching everywhere else. Their non-fiction is surprisingly deep."</p>
+                         <p class="font-semibold text-brand-brown-dark text-sm">- Sameera W.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm text-center fade-in-element" style="animation-delay: 0.4s;">
+                         <i class="fas fa-quote-left text-2xl text-brand-accent mb-4"></i>
+                         <p class="text-gray-600 italic mb-4 text-sm">"The children's corner is fantastic and always has something new. My kids love visiting, and the staff recommendations are spot on."</p>
+                         <p class="font-semibold text-brand-brown-dark text-sm">- Nalini R.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+         <section id="services" class="py-16 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl font-bold text-brand-brown-dark mb-12">How We Can Help</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="fade-in-element">
+                        <div class="text-4xl text-brand-accent mb-3"><i class="fas fa-search-plus"></i></div>
+                        <h4 class="text-xl font-semibold text-brand-brown-dark mb-2">Special Book Orders</h4>
+                        <p class="text-gray-600 text-sm leading-relaxed">Can't find a specific title on our shelves? Let us know! We'll do our best to source it for you, locally or internationally.</p>
+                    </div>
+                     <div class="fade-in-element" style="animation-delay: 0.1s;">
+                        <div class="text-4xl text-brand-accent mb-3"><i class="fas fa-gift"></i></div>
+                        <h4 class="text-xl font-semibold text-brand-brown-dark mb-2">Gift Vouchers & Wrapping</h4>
+                        <p class="text-gray-600 text-sm leading-relaxed">Give the perfect present for any book lover. We offer beautifully designed gift vouchers and elegant wrapping services.</p>
+                    </div>
+                     <div class="fade-in-element" style="animation-delay: 0.2s;">
+                        <div class="text-4xl text-brand-accent mb-3"><i class="fas fa-school"></i></div>
+                        <h4 class="text-xl font-semibold text-brand-brown-dark mb-2">Educational & Bulk Supply</h4>
+                        <p class="text-gray-600 text-sm leading-relaxed">We stock essential stationery and can assist schools or institutions with bulk orders for textbooks and supplies.</p>
+                    </div>
+                </div>
+                <a href="#contact" class="mt-12 inline-block text-brand-brown-dark hover:text-brand-accent font-semibold transition duration-300">Inquire About Services <i class="fas fa-phone-alt ml-1 text-xs"></i></a>
+            </div>
+        </section>
+
+        <section id="contact" class="py-16 bg-brand-cream">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center text-brand-brown-dark mb-12">Visit Our Store or Get in Touch</h2>
+                <div class="flex flex-col lg:flex-row gap-12">
+                    <div class="lg:w-1/2 fade-in-element">
+                        <h3 class="text-2xl font-semibold text-brand-brown-dark mb-4">Find C BookHouse</h3>
+                         <div class="space-y-3 text-gray-700 mb-6 text-sm md:text-base">
+                            <p><i class="fas fa-map-marker-alt fa-fw w-6 text-brand-accent mr-2"></i> 45 Galle Road, Colombo 03, Sri Lanka</p>
+                            <p><i class="fas fa-phone-alt fa-fw w-6 text-brand-accent mr-2"></i> +94 11 2345678</p>
+                            <p><i class="fas fa-envelope fa-fw w-6 text-brand-accent mr-2"></i> info@cbookhouse.lk</p>
+                            <p><i class="fas fa-clock fa-fw w-6 text-brand-accent mr-2"></i> Mon - Sat: 9:00 AM - 7:00 PM | Sun: 10:00 AM - 5:00 PM</p>
+                        </div>
+                        <div class="bg-gray-200 h-64 rounded-lg flex items-center justify-center text-gray-500 text-sm italic">
+                            (Map Placeholder - e.g., Google Maps)
+                        </div>
+                    </div>
+                    <div class="lg:w-1/2 fade-in-element" style="animation-delay: 0.1s;">
+                         <h3 class="text-2xl font-semibold text-brand-brown-dark mb-4">Send Us a Message</h3>
+                         <p class="text-sm text-gray-600 mb-4">Have a question, suggestion, or book inquiry? We'd love to hear from you!</p>
+                        <form id="bookInquiryForm" class="space-y-4">
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                                <input type="text" id="name" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-brand-accent focus:border-brand-accent text-sm">
+                            </div>
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Your Email</label>
+                                <input type="email" id="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-brand-accent focus:border-brand-accent text-sm">
+                            </div>
+                            <div>
+                                <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subject (Optional)</label>
+                                <input type="text" id="subject" name="subject" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-brand-accent focus:border-brand-accent text-sm">
+                            </div>
+                            <div>
+                                <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                                <textarea id="message" name="message" rows="4" required class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-brand-accent focus:border-brand-accent text-sm"></textarea>
+                            </div>
+                            <div>
+                                <button type="submit" class="w-full bg-brand-brown-dark hover:bg-brand-brown-light text-white font-bold py-3 px-6 rounded-md shadow-lg transition duration-300 transform hover:scale-105">Send Your Message</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+     <footer class="bg-brand-brown-dark text-white pt-16 pb-8">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h4 class="text-xl font-semibold mb-4 font-serif">C BookHouse</h4>
+                    <p class="text-gray-300 text-sm leading-relaxed">Colombo's favourite literary destination. Discover books, connect with community, and explore ideas with us since 2005.</p>
+                </div>
+                <div>
+                    <h5 class="text-lg font-semibold mb-4">Explore</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#about" class="text-gray-300 hover:text-white transition duration-300">About C BookHouse</a></li>
+                        <li><a href="#collections" class="text-gray-300 hover:text-white transition duration-300">Browse Collections</a></li>
+                        <li><a href="#events" class="text-gray-300 hover:text-white transition duration-300">Upcoming Events</a></li>
+                         <li><a href="#blog" class="text-gray-300 hover:text-white transition duration-300">Our Blog</a></li>
+                         <li><a href="#community" class="text-gray-300 hover:text-white transition duration-300">Membership</a></li>
+                        <li><a href="#contact" class="text-gray-300 hover:text-white transition duration-300">Visit Us</a></li>
+                         <li><a href="#" class="text-gray-300 hover:text-white transition duration-300">FAQs</a></li>
+                    </ul>
+                </div>
+                <div>
+                     <h5 class="text-lg font-semibold mb-4">Stay Connected</h5>
+                     <p class="text-gray-300 text-sm mb-4">Subscribe for C BookHouse news, event invites, special offers, and reading recommendations right to your inbox.</p>
+                     <button id="newsletterBtnFooter" class="w-full bg-brand-accent hover:bg-yellow-600 text-brand-brown-dark font-bold py-2 px-4 rounded-md shadow transition duration-300">Subscribe to Newsletter</button>
+                </div>
+                 <div>
+                    <h5 class="text-lg font-semibold mb-4">Follow & Find Us</h5>
+                     <div class="flex space-x-4 mb-4">
+                        <a href="#" aria-label="Facebook" class="text-gray-300 hover:text-white transition duration-300 text-xl"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Instagram" class="text-gray-300 hover:text-white transition duration-300 text-xl"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Twitter" class="text-gray-300 hover:text-white transition duration-300 text-xl"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Goodreads" class="text-gray-300 hover:text-white transition duration-300 text-xl"><i class="fab fa-goodreads-g"></i></a>
+                    </div>
+                    <p class="text-gray-400 text-xs mt-4">
+                        <i class="fas fa-map-marker-alt fa-fw mr-1"></i> 45 Galle Road, Colombo 03<br>
+                        <i class="fas fa-phone-alt fa-fw mr-1"></i> +94 11 2345678 <br>
+                        <i class="fas fa-envelope fa-fw mr-1"></i> info@cbookhouse.lk
+                    </p>
+                 </div>
+            </div>
+            <hr class="border-gray-600 my-8">
+            <div class="text-center text-gray-400 text-sm">
+                &copy; <span id="currentYear"></span> C BookHouse. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <div id="newsletterModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100] hidden p-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-white p-8 rounded-lg shadow-xl max-w-md w-full relative transform transition-all duration-300 scale-95 opacity-0" id="newsletterModalContent">
+            <button id="closeModalBtn" class="absolute top-3 right-4 text-gray-500 hover:text-gray-800 text-2xl font-light" aria-label="Close modal">&times;</button>
+            <h3 class="text-2xl font-semibold text-brand-brown-dark mb-4">Subscribe to Our Newsletter</h3>
+            <p class="text-gray-600 mb-6 text-sm md:text-base">Be the first to know about new releases, exclusive author events, member discounts, and special promotions from C BookHouse.</p>
+            <form id="newsletterForm" class="space-y-4">
+                <div>
+                    <label for="newsletter-email" class="sr-only">Email Address</label>
+                    <input type="email" id="newsletter-email" placeholder="Enter your email address" required class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-brand-accent focus:border-brand-accent text-sm">
+                </div>
+                <div>
+                     <button type="submit" class="w-full bg-brand-brown-dark hover:bg-brand-brown-light text-white font-bold py-3 px-6 rounded-md shadow-lg transition duration-300">Subscribe Now</button>
+                </div>
+            </form>
+             <p class="text-xs text-gray-500 mt-4">We value your privacy. Unsubscribe easily at any time.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const searchIcon = document.getElementById('searchIcon');
+            const searchBar = document.getElementById('searchBar');
+            const newsletterBtnFooter = document.getElementById('newsletterBtnFooter');
+            const newsletterModal = document.getElementById('newsletterModal');
+            const newsletterModalContent = document.getElementById('newsletterModalContent');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const bookInquiryForm = document.getElementById('bookInquiryForm');
+            const newsletterForm = document.getElementById('newsletterForm');
+            const fadeElements = document.querySelectorAll('.fade-in-element');
+
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            mobileMenuButton?.addEventListener('click', () => {
+                mobileMenu?.classList.toggle('hidden');
+            });
+
+            searchIcon?.addEventListener('click', () => {
+                searchBar?.classList.toggle('hidden');
+                if (searchBar && !searchBar.classList.contains('hidden')) {
+                    searchBar.querySelector('input')?.focus();
+                }
+            });
+
+            mobileMenu?.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu?.classList.add('hidden');
+                });
+            });
+
+            const openModal = () => {
+                if (!newsletterModal || !newsletterModalContent) return;
+                newsletterModal.classList.remove('hidden');
+                void newsletterModal.offsetWidth;
+                newsletterModal.classList.remove('opacity-0');
+                newsletterModalContent.classList.remove('scale-95', 'opacity-0');
+                newsletterModalContent.classList.add('scale-100', 'opacity-100');
+            };
+
+            const closeModal = () => {
+                 if (!newsletterModal || !newsletterModalContent) return;
+                 newsletterModalContent.classList.remove('scale-100', 'opacity-100');
+                 newsletterModalContent.classList.add('scale-95', 'opacity-0');
+                 newsletterModal.classList.add('opacity-0');
+                 setTimeout(() => {
+                    newsletterModal.classList.add('hidden');
+                 }, 300);
+            };
+
+            newsletterBtnFooter?.addEventListener('click', openModal);
+            closeModalBtn?.addEventListener('click', closeModal);
+            newsletterModal?.addEventListener('click', (e) => {
+                if (e.target === newsletterModal) {
+                    closeModal();
+                }
+            });
+
+            bookInquiryForm?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const nameInput = document.getElementById('name');
+                const name = nameInput?.value || 'there';
+                alert(`Thank you, ${name}! Your message has been received (simulation). We'll be in touch soon!`);
+                bookInquiryForm.reset();
+            });
+
+            newsletterForm?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const emailInput = document.getElementById('newsletter-email');
+                const email = emailInput?.value || 'your email';
+                alert(`Thank you for subscribing ${email} to the C BookHouse newsletter! (simulation).`);
+                newsletterForm.reset();
+                closeModal();
+            });
+
+             if ("IntersectionObserver" in window) {
+                const observer = new IntersectionObserver((entries, observerInstance) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            observerInstance.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1 });
+                fadeElements.forEach(el => { observer.observe(el); });
+             } else {
+                 fadeElements.forEach(el => el.classList.add('visible'));
+             }
+
+            const p5Container = document.getElementById('p5-canvas-container');
+            if (p5Container && typeof p5 !== 'undefined') {
+                const sketch = (p) => {
+                    let particles = [];
+                    const numParticles = 25;
+                    p.setup = () => {
+                        let canvas = p.createCanvas(p5Container.offsetWidth, p5Container.offsetHeight);
+                        canvas.parent('p5-canvas-container');
+                        p.noStroke();
+                         for(let i = 0; i < numParticles; i++) {
+                            particles.push({
+                                x: p.random(p.width), y: p.random(p.height),
+                                vx: p.random(-0.1, 0.1), vy: p.random(-0.1, 0.1),
+                                size: p.random(1, 2.5) // Slightly smaller range
+                            });
+                        }
+                    };
+                    p.draw = () => {
+                        p.clear();
+                        p.fill(74, 37, 25, 35); // Dark brown, even lower alpha
+                         particles.forEach(part => {
+                             part.x += part.vx; part.y += part.vy;
+                             if (part.x < 0) part.x = p.width; if (part.x > p.width) part.x = 0;
+                             if (part.y < 0) part.y = p.height; if (part.y > p.height) part.y = 0;
+                             p.ellipse(part.x, part.y, part.size, part.size);
+                         });
+                    };
+                     p.windowResized = () => { p.resizeCanvas(p5Container.offsetWidth, p5Container.offsetHeight); };
+                };
+                new p5(sketch);
+            }
+
+            const threeContainer = document.getElementById('threejs-canvas-container');
+            if (threeContainer && typeof THREE !== 'undefined') {
+                let scene, camera, renderer, shape;
+                function initThreeJS() {
+                    scene = new THREE.Scene();
+                    camera = new THREE.PerspectiveCamera(50, threeContainer.offsetWidth / threeContainer.offsetHeight, 0.1, 100);
+                    camera.position.z = 5.5; // Adjusted position slightly
+                    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                    renderer.setSize(threeContainer.offsetWidth, threeContainer.offsetHeight);
+                    renderer.setPixelRatio(window.devicePixelRatio);
+                    threeContainer.appendChild(renderer.domElement);
+                    const geometry = new THREE.TorusKnotGeometry(1.1, 0.25, 100, 16); // Adjusted params slightly
+                     const material = new THREE.MeshStandardMaterial({ color: 0xD4AF37, metalness: 0.4, roughness: 0.6 }); // Adjusted roughness
+                    shape = new THREE.Mesh(geometry, material);
+                    scene.add(shape);
+                    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); // Increased ambient
+                    scene.add(ambientLight);
+                    const pointLight = new THREE.PointLight(0xffffff, 0.6); // Decreased point slightly
+                    pointLight.position.set(5, 8, 6); // Adjusted light position
+                    scene.add(pointLight);
+                    window.addEventListener('resize', onWindowResize, false);
+                    animateThreeJS();
+                }
+                function onWindowResize() {
+                     if (!camera || !renderer || !threeContainer) return;
+                     camera.aspect = threeContainer.offsetWidth / threeContainer.offsetHeight;
+                     camera.updateProjectionMatrix();
+                     renderer.setSize(threeContainer.offsetWidth, threeContainer.offsetHeight);
+                }
+                function animateThreeJS() {
+                    requestAnimationFrame(animateThreeJS);
+                    if (shape) { shape.rotation.x += 0.001; shape.rotation.y += 0.002; }
+                     if (renderer && scene && camera) { renderer.render(scene, camera); }
+                }
+                initThreeJS();
+            }
+        });
+    </script>
+
+</body>
+</html>
